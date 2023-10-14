@@ -1,28 +1,32 @@
-import os
-import numpy as np
 import json
+import os
+
+import clearml
+import numpy as np
 import torch
+import tqdm
 
 
 class Trainer:
     """Main class for model training"""
-    
+
     def __init__(
-        self,
-        model,
-        epochs,
-        train_dataloader,
-        train_steps,
-        val_dataloader,
-        val_steps,
-        checkpoint_frequency,
-        criterion,
-        optimizer,
-        lr_scheduler,
-        device,
-        model_dir,
-        model_name,
-    ):  
+            self,
+            model,
+            epochs,
+            train_dataloader,
+            train_steps,
+            val_dataloader,
+            val_steps,
+            checkpoint_frequency,
+            criterion,
+            optimizer,
+            lr_scheduler,
+            device,
+            model_dir,
+            model_name,
+            clearml_logger: clearml.logger.Logger
+    ):
         self.model = model
         self.epochs = epochs
         self.train_dataloader = train_dataloader
@@ -39,9 +43,10 @@ class Trainer:
 
         self.loss = {"train": [], "val": []}
         self.model.to(self.device)
+        self.clearml_logger = clearml_logger
 
     def train(self):
-        for epoch in range(self.epochs):
+        for epoch in tqdm.tqdm(range(self.epochs)):
             self._train_epoch()
             self._validate_epoch()
             print(
@@ -52,8 +57,10 @@ class Trainer:
                     self.loss["val"][-1],
                 )
             )
-
+            self.clearml_logger.report_scalar('Loss', 'Train', self.loss["train"][-1], epoch)
+            self.clearml_logger.report_scalar('Loss', 'Validation', self.loss["val"][-1], epoch)
             self.lr_scheduler.step()
+            self.clearml_logger.report_scalar('Learning_rate', 'value', self.lr_scheduler.get_lr(), epoch)
 
             if self.checkpoint_frequency:
                 self._save_checkpoint(epoch)
