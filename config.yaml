@@ -5,8 +5,8 @@ model_name: skipgram
 
 dataset: WikiText2
 data_dir: data/
-train_batch_size: 256
-val_batch_size: 256
+train_batch_size: 128
+val_batch_size: 128
 shuffle: True
 
 optimizer: Adam
@@ -16,4 +16,4 @@ train_steps:
 val_steps: 
 
 checkpoint_frequency: 
-model_dir: weights/cbow_WikiText2_b256_e50
+model_dir: weights/cbow_WikiText2_b128_e50

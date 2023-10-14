@@ -46,7 +46,7 @@ class Trainer:
         self.clearml_logger = clearml_logger
 
     def train(self):
-        for epoch in tqdm.tqdm(range(self.epochs)):
+        for epoch in range(self.epochs):
             self._train_epoch()
             self._validate_epoch()
             print(
@@ -60,7 +60,7 @@ class Trainer:
             self.clearml_logger.report_scalar('Loss', 'Train', self.loss["train"][-1], epoch)
             self.clearml_logger.report_scalar('Loss', 'Validation', self.loss["val"][-1], epoch)
             self.lr_scheduler.step()
-            self.clearml_logger.report_scalar('Learning_rate', 'value', self.lr_scheduler.get_lr(), epoch)
+            self.clearml_logger.report_scalar('Learning_rate', 'value', self.lr_scheduler.get_lr()[0], epoch)
 
             if self.checkpoint_frequency:
                 self._save_checkpoint(epoch)
@@ -69,7 +69,7 @@ class Trainer:
         self.model.train()
         running_loss = []
 
-        for i, batch_data in enumerate(self.train_dataloader, 1):
+        for i, batch_data in tqdm.tqdm(enumerate(self.train_dataloader, 1), desc="Train"):
             inputs = batch_data[0].to(self.device)
             labels = batch_data[1].to(self.device)
 
@@ -92,7 +92,7 @@ class Trainer:
         running_loss = []
 
         with torch.no_grad():
-            for i, batch_data in enumerate(self.val_dataloader, 1):
+            for i, batch_data in tqdm.tqdm(enumerate(self.val_dataloader, 1), desc="Validation"):
                 inputs = batch_data[0].to(self.device)
                 labels = batch_data[1].to(self.device)
 
