@@ -17,7 +17,7 @@ from utils.helper import (
 from utils.trainer import Trainer
 
 
-def train(cfg):
+def train(cfg, _clearml_logger):
     os.makedirs(cfg["model_dir"])
 
     train_dataloader, vocab = get_dataloader_and_vocab(
@@ -52,7 +52,6 @@ def train(cfg):
     lr_scheduler = get_lr_scheduler(optimizer, cfg["epochs"], verbose=True)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    clearml_logger = clearml.Task.init(project_name='Word2Vec-Pytorch', task_name='Wiki103-default').get_logger()
 
     trainer = Trainer(
         model=model,
@@ -68,7 +67,7 @@ def train(cfg):
         device=device,
         model_dir=cfg["model_dir"],
         model_name=cfg["model_name"],
-        clearml_logger=clearml_logger
+        clearml_logger=_clearml_logger
     )
 
     trainer.train()
@@ -88,4 +87,9 @@ if __name__ == '__main__':
 
     with open(args.config, 'r') as stream:
         config = yaml.safe_load(stream)
-    train(config)
+
+    clearml_task = clearml.Task.init(project_name=config['project_name'], task_name=config['task_name'])
+    clearml_logger = clearml_task.get_logger()
+    clearml_task.connect_configuration(args.config)
+
+    train(config, clearml_logger)

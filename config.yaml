@@ -1,16 +1,19 @@
-model_name: cbow
+project_name: Word2Vec-Pytorch
+task_name: Wiki2-baseline
+
+model_name: skipgram
 
 dataset: WikiText2
 data_dir: data/
-train_batch_size: 96
-val_batch_size: 96
+train_batch_size: 256
+val_batch_size: 256
 shuffle: True
 
 optimizer: Adam
 learning_rate: 0.025
-epochs: 5
+epochs: 50
 train_steps: 
 val_steps: 
 
 checkpoint_frequency: 
-model_dir: weights/cbow_WikiText2
+model_dir: weights/cbow_WikiText2_b256_e50
