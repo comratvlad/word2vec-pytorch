@@ -60,7 +60,7 @@ class Trainer:
             self.clearml_logger.report_scalar('Loss', 'Train', self.loss["train"][-1], epoch)
             self.clearml_logger.report_scalar('Loss', 'Validation', self.loss["val"][-1], epoch)
             self.lr_scheduler.step()
-            self.clearml_logger.report_scalar('Learning_rate', 'value', self.lr_scheduler.get_last_lr(), epoch)
+            self.clearml_logger.report_scalar('Learning_rate', 'value', self.lr_scheduler.get_last_lr()[0], epoch)
 
             if self.checkpoint_frequency:
                 self._save_checkpoint(epoch)
